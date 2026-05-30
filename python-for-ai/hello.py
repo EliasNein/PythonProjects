@@ -1,33 +1,108 @@
 # %%
-import requests
+import os
 
-# We need coordinates to get weather data
-latitude = 48.85   # Paris latitude
-longitude = 2.35   # Paris longitude
 
-# Build the API URL with our parameters
-url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m"
+class Dog:
+    def __init__(self, name, breed):
+        self.name = name
+        self.breed = breed
 
-# Make the request
-response = requests.get(url)
-data = response.json()
 
-temperature = data["current"]["temperature_2m"]
+# Create dog objects - using positional arguments
+dog1 = Dog("Buddy", "Golden Retriever")
+dog2 = Dog("Max", "Beagle")
+
+# Or with named arguments (clearer)
+dog3 = Dog(name="Charlie", breed="Poodle")
+
+print(dog1.name)  # Buddy
+print(dog2.breed)  # Beagle
+
+
 # %%
-import requests
+class APIConfig:
+    def __init__(self, api_key, model="gpt-3.5-turbo", max_tokens=100):
+        self.api_key = api_key
+        self.model = model
+        self.max_tokens = max_tokens
+        self.base_url = "https://api.openai.com/v1"
 
-def get_weather(latitude, longitude):
-    response = requests.get(f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,wind_speed_10m")
-    data = response.json()
-    return data['current']['temperature_2m']
 
-# Get temperature for different cities
-paris_temp = get_weather(48.85, 2.35)
-london_temp = get_weather(51.50, -0.12)
-tokyo_temp = get_weather(35.68, 139.69)
+# Create different configurations
+# Using positional for required arg, named for optional
+dev_config = APIConfig("sk-dev-key", max_tokens=50)
 
-print(f"Paris: {paris_temp}°C")
-print(f"London: {london_temp}°C")
-print(f"Tokyo: {tokyo_temp}°C")
+# Using all named arguments (clearest)
+prod_config = APIConfig(api_key="sk-prod-key", model="gpt-4", max_tokens=1000)
 
-#305
+# Access the configuration
+print(dev_config.model)  # gpt-3.5-turbo
+print(prod_config.model)  # gpt-4
+print(prod_config.max_tokens)  # 1000
+
+
+# %%
+class DataValidator:
+    def __init__(self):
+        self.errors = []
+
+    def validate_email(self, email):
+        if "@" not in email:
+            self.errors.append(f"Invalid email: {email}")
+            return False
+        return True
+
+    def validate_age(self, age):
+        if age < 0 or age > 150:
+            self.errors.append(f"Invalid age: {age}")
+            return False
+        return True
+
+    def get_errors(self):
+        return self.errors
+
+
+# Use the validator
+validator = DataValidator()
+
+# Notice: we don't pass self, just the email
+validator.validate_email(email="bad-email")
+validator.validate_age(age=200)
+
+# Or using positional arguments
+validator.validate_email("another-bad-email")
+validator.validate_age(150)
+
+print(validator.get_errors())
+# ['Invalid email: bad-email', 'Invalid age: 200', 'Invalid email: another-bad-email']
+# %%
+
+# Read from environment
+api_key = os.environ.get("API_KEY")
+database = os.environ.get("DATABASE_URL")
+
+print(f"Using database: {database}")
+print(f"Using database: {api_key}")
+# %%
+from dotenv import load_dotenv
+
+load_dotenv()
+# or if not work
+load_dotenv("../.env")
+
+# %%
+import os
+
+
+def calculate_total(items):
+    total = 0
+    for item in items:
+        total += item["price"] * item["quantity"]
+    return total
+
+
+shopping_cart = [
+    {"name": "apple", "price": 0.5, "quantity": 6},
+    {"name": "banana", "price": 0.3, "quantity": 8},
+]
+print(calculate_total(shopping_cart))
